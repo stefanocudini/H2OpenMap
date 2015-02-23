@@ -1,0 +1,35 @@
+/*
+Theme Name:     H2OpenMap basic map style sheet 01
+Theme URI:      http://www.www.h2openmap.org
+Description:    basic stylesheet for H2OpenMap map page
+Author:         Francesco Giunta
+Author URI:     http://www.h2openmap.org
+Version:        1.0.0
+License:        GNU General Public License v2 or later
+License URI:    http://www.gnu.org/licenses/gpl-2.0.html
+Tags:           basic, style, H2OpenMap,
+*/
+
+body { 
+	margin:0; 
+	padding:0; 
+}
+#menu {
+	position:absolute;
+	top:0; 
+	left:10px; 
+	bottom:0; 
+	width:100%; 
+}
+#map { 
+	position:absolute; 
+	top:20px; 
+	bottom:0; 
+	width:100%; 
+}
+a, a:visited, a:hover {
+	text-decoration: none;
+	color: #999;
+}
+
+
