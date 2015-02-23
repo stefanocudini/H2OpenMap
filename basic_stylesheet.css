@@ -15,21 +15,24 @@ body {
 	padding:0; 
 }
 #menu {
-	position:absolute;
+	position:fixed;
 	top:0; 
 	left:10px; 
 	bottom:0; 
-	width:100%; 
+	right:0; 
 }
 #map { 
-	position:absolute; 
+	position:fixed; 
 	top:20px; 
 	bottom:0; 
-	width:100%; 
+	right: 0;
+    left:0;
 }
 a, a:visited, a:hover {
 	text-decoration: none;
-	color: #999;
+	color: #777;
+    font-size:13px;
+    font-family:sans-serif;
 }
 
 

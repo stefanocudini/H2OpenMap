@@ -2,23 +2,30 @@
 <html>
 <head>
 	<meta charset=utf-8 />
-	<title>A simple map</title>
+	<title>H2OOpenMap</title>
 	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link rel="stylesheet" href="basic_stylesheet.css" type="text/css" media="all">
+
+<script type="text/javascript">
+//https://code.google.com/p/microajax/
+function microAjax(B,A){this.bindFunction=function(E,D){return function(){return E.apply(D,[D])}};this.stateChange=function(D){if(this.request.readyState==4){this.callbackFunction(this.request.responseText)}};this.getRequest=function(){if(window.ActiveXObject){return new ActiveXObject("Microsoft.XMLHTTP")}else{if(window.XMLHttpRequest){return new XMLHttpRequest()}}return false};this.postBody=(arguments[2]||"");this.callbackFunction=A;this.url=B;this.request=this.getRequest();if(this.request){var C=this.request;C.onreadystatechange=this.bindFunction(this.stateChange,this);if(this.postBody!==""){C.open("POST",B,true);C.setRequestHeader("X-Requested-With","XMLHttpRequest"); C.setRequestHeader("Content-type","application/x-www-form-urlencoded");C.setRequestHeader("Connection","close")}else{C.open("GET",B,true)}C.send(this.postBody)}};
+</script>
+
 </head>
 <body>
-    <div id='menu'><a href="../">back to H2OpenMap web site</a></div>
+    <div id='menu'>
+    <a href="../">back to H2OpenMap web site</a>
+    </div>
 	<div id='map'></div>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <!-- leaflet.markercluster -->
-    <!-- leaflet.markercluster -->
-<!--<link rel="stylesheet" href="js/leaflet.markercluster/MarkerCluster.css" /> -->
-<!--<link rel="stylesheet" href="js/leaflet.markercluster/MarkerCluster.Default.css" /> -->
-<!--<script src="js/leaflet.markercluster/leaflet.markercluster-src.js" ></script> -->
-<!--<script src="js/leaflet.markercluster/leaflet.markercluster.js" ></script> -->
-    <!-- Dati -->
-	<script src="data/water_well.js"> </script>
+<!---->
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
+<link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
+<!---->
     <script >
 
     //creo una mappa con relativa posizione e zoom iniziali
@@ -30,9 +37,11 @@
             maxZoom: 18
         }).addTo(map);
 
+var hash = L.hash(map);
+
     // Icona Marker
     var singleIcon = L.icon({
-        iconUrl: 'img/india.png', // the icon for india style pumps
+        iconUrl: 'img/india32.png', // the icon for india style pumps
     //  shadowUrl: 'img/chose_one.png', // not defined yet......
         iconSize:     [20, 20], // size of the icon
         shadowSize:   [20, 20], // size of the shadow
@@ -52,7 +61,7 @@
 
 	// Icona GeoJSON
 	var wwIcon = L.icon ({
-	    iconUrl: 'img/water_tap.png',
+	    iconUrl: 'img/water_tap32.png',
     //  shadowUrl: 'img/chose_one.png', // not defined yet......
 	    iconSize:     [20, 20], // size of the icon
 	    shadowSize:   [20, 20], // size of the shadow
@@ -62,43 +71,49 @@
 	});
 
 
+var markers = new L.MarkerClusterGroup();
+
+microAjax('water_well.geojson',function (res) { 
+var water_well=JSON.parse(res);
 	// Dati GeoJSON
-	var wwMarker = L.geoJson(water_well, {
-	  	pointToLayer : function  (feature, latlng) {
-	  		lat = feature.geometry.coordinates[0];
-	  		lng = feature.geometry.coordinates[1];
+water_well.features.forEach(function(well)
+{
+console.log(well);
+	  		lat = well.geometry.coordinates[0];
+	  		lng = well.geometry.coordinates[1];
             //popup common tags 
-            id = feature.id;
-            man_made = feature.properties.man_made;
-            pump = feature.properties.pump;
-            condition = feature.properties.condition;
-            disused = feature.properties.disused;
-            aband = feature.properties.abandoned;
-            access = feature.properties.access;
-            drinking_water = feature.properties.drinking_water;
-            operator = feature.properties.operator;
-            op_type = feature.properties.operator_type;
-            name = feature.properties.name;
-            source = feature.properties.source;
-            note = feature.properties.note;
-            fixme = feature.properties.fixme;
+            id = well.id;
+            man_made = well.properties.man_made;
+            pump = well.properties.pump;
+            condition = well.properties.condition;
+            disused = well.properties.disused;
+            aband = well.properties.abandoned;
+            access = well.properties.access;
+            drinking_water = well.properties.drinking_water;
+            operator = well.properties.operator;
+            op_type = well.properties.operator_type;
+            name = well.properties.name;
+            source = well.properties.source;
+            note = well.properties.note;
+            fixme = well.properties.fixme;
             //Rasmata Onlus tags
-            ww_type = feature.properties.water_well_type;
-            top_type = feature.properties.top_type;
-            m_pump_type = feature.properties.manual_pump_type;
-            image = feature.properties.image;
+            ww_type = well.properties.water_well_type;
+            top_type = well.properties.top_type;
+            m_pump_type = well.properties.manual_pump_type;
+            image = well.properties.image;
             // MVP Columbia Universiti tags
-            ele = feature.properties.ele;
-            grid = feature.properties.grid_proximity;
-            district = feature.properties.is_in_district;
-            region = feature.properties.is_in_region;
-            operational_status = feature.properties.operational_status;
-            pipe_connection = feature.properties.pipe_connection;
-            seasonal = feature.properties.seasonal;
-            source_date = feature.properties.source_date;
-            source_ele = feature.properties.source_ele;
-            ww_source_type = feature.properties.water_wells_source_type;
-	  		return L.marker([lng,lat], {icon: wwIcon}).bindPopup(
+            ele = well.properties.ele;
+            grid = well.properties.grid_proximity;
+            district = well.properties.is_in_district;
+            region = well.properties.is_in_region;
+            operational_status = well.properties.operational_status;
+            pipe_connection = well.properties.pipe_connection;
+            seasonal = well.properties.seasonal;
+            source_date = well.properties.source_date;
+            source_ele = well.properties.source_ele;
+            ww_source_type = well.properties.water_wells_source_type;
+	  		
+            var mrkr= L.marker([lng,lat], {icon: wwIcon}).bindPopup(
                 "<b>id=</b> <a target='_blank' href='//www.openstreetmap.org/"+id+"'>"+id+"</a><br>"+
                 "<b>man_made=</b> "+man_made+"<br>"+
                 "<b>position=</b> lat:"+lat+" lon:"+lng+"<br><br>"+
@@ -139,9 +154,10 @@
                 "<b>source_ele=</b> "+source_ele+"<br>"+
                 "<b>water_wells_source_type=</b> "+ww_source_type+"<br>"
                 );
-	  	}
-	  }).addTo(map);
-
+        mrkr.addTo(markers);
+	  	});
+map.addLayer(markers);
+});
 
 	  // Mapbox Streets
 //---------------
@@ -162,18 +178,13 @@ var mapboxTilesMedieval = L.tileLayer('https://{s}.tiles.mapbox.com/v3/spatial.b
         "Sfondo Mapbox Medieval": mapboxTilesMedieval
     };
     var featureLayers={
-        "water well": wwMarker,
+        "water well": markers,
         "water well Nanoro" : singleMarker
     };
     // Creo i controlli
     L.control.layers(baseMaps, featureLayers).addTo(map);
     // Per un metodo moolto più succinto (che usa però Mapbox.js) guardare questo link: https://www.mapbox.com/mapbox.js/example/v1.0.0/toggle-baslayers/
 
-
-    //var markers = new L.MarkerClusterGroup();
-//markers.addLayer(wwMarker);
-//... Add more layers ...
-//map.addLayer(markers);
 	</script>
 
 </body>
