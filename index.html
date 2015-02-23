@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset=utf-8 />
+	<title>A simple map</title>
+	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link rel="stylesheet" href="basic_stylesheet.css" type="text/css" media="all">
+</head>
+<body>
+    <div id='menu'><a href="../">back to H2OpenMap web site</a></div>
+	<div id='map'></div>
+	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <!-- leaflet.markercluster -->
+    <!-- leaflet.markercluster -->
+<!--<link rel="stylesheet" href="js/leaflet.markercluster/MarkerCluster.css" /> -->
+<!--<link rel="stylesheet" href="js/leaflet.markercluster/MarkerCluster.Default.css" /> -->
+<!--<script src="js/leaflet.markercluster/leaflet.markercluster-src.js" ></script> -->
+<!--<script src="js/leaflet.markercluster/leaflet.markercluster.js" ></script> -->
+    <!-- Dati -->
+	<script src="data/water_well.js"> </script>
+    <script >
+
+    //creo una mappa con relativa posizione e zoom iniziali
+     var map = L.map('map').setView([12.68321, -0.74158], 7);
+
+    //aggiungo un layer di sfondo, o Base Layer
+    var baseLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http:// mapbox.com">Mapbox</a>',
+            maxZoom: 18
+        }).addTo(map);
+
+    // Icona Marker
+    var singleIcon = L.icon({
+        iconUrl: 'img/india.png', // the icon for india style pumps
+    //  shadowUrl: 'img/chose_one.png', // not defined yet......
+        iconSize:     [20, 20], // size of the icon
+        shadowSize:   [20, 20], // size of the shadow
+        iconAnchor:   [0, 0], // point of the icon which will correspond to marker's location
+        shadowAnchor: [0, 0],  // the same for the shadow
+        popupAnchor:  [10, 20] // point from which the popup should open relative to the iconAnchor
+    });
+
+    // Oggetto marker
+	var singleMarker = L.marker([12.6923891, -2.1997114], {
+		icon:singleIcon
+	})
+	    .bindPopup('<b>Node 3315201454</b><br>Tags:<br>access=yes<br>drinking_water=yes<br>man_made=water_well<br>pump=manual<br>source=Rasmata Onlus<br><br>Coordinates:<br>12.6923891  -2.1997114 (lat,lon)')
+	    .openPopup()
+	    .addTo(map)
+
+
+	// Icona GeoJSON
+	var wwIcon = L.icon ({
+	    iconUrl: 'img/water_tap.png',
+    //  shadowUrl: 'img/chose_one.png', // not defined yet......
+	    iconSize:     [20, 20], // size of the icon
+	    shadowSize:   [20, 20], // size of the shadow
+	    iconAnchor:   [0, 0 ], // point of the icon which will correspond to marker's location
+	    shadowAnchor: [0, 0],  // the same for the shadow
+	    popupAnchor:  [10, 0] // point from which the popup should open relative to the iconAnchor
+	});
+
+
+	// Dati GeoJSON
+	var wwMarker = L.geoJson(water_well, {
+	  	pointToLayer : function  (feature, latlng) {
+	  		lat = feature.geometry.coordinates[0];
+	  		lng = feature.geometry.coordinates[1];
+            //popup common tags 
+            id = feature.id;
+            man_made = feature.properties.man_made;
+            pump = feature.properties.pump;
+            condition = feature.properties.condition;
+            disused = feature.properties.disused;
+            aband = feature.properties.abandoned;
+            access = feature.properties.access;
+            drinking_water = feature.properties.drinking_water;
+            operator = feature.properties.operator;
+            op_type = feature.properties.operator_type;
+            name = feature.properties.name;
+            source = feature.properties.source;
+            note = feature.properties.note;
+            fixme = feature.properties.fixme;
+            //Rasmata Onlus tags
+            ww_type = feature.properties.water_well_type;
+            top_type = feature.properties.top_type;
+            m_pump_type = feature.properties.manual_pump_type;
+            image = feature.properties.image;
+            // MVP Columbia Universiti tags
+            ele = feature.properties.ele;
+            grid = feature.properties.grid_proximity;
+            district = feature.properties.is_in_district;
+            region = feature.properties.is_in_region;
+            operational_status = feature.properties.operational_status;
+            pipe_connection = feature.properties.pipe_connection;
+            seasonal = feature.properties.seasonal;
+            source_date = feature.properties.source_date;
+            source_ele = feature.properties.source_ele;
+            ww_source_type = feature.properties.water_wells_source_type;
+	  		return L.marker([lng,lat], {icon: wwIcon}).bindPopup(
+                "<b>id=</b> <a target='_blank' href='//www.openstreetmap.org/"+id+"'>"+id+"</a><br>"+
+                "<b>man_made=</b> "+man_made+"<br>"+
+                "<b>position=</b> lat:"+lat+" lon:"+lng+"<br><br>"+
+
+                "<b><u>common tags</u></b><br><br>"+
+
+                "<b>pump=</b> "+pump+"<br>"+
+                "<b>condition=</b> "+condition+"<br>"+
+                "<b>disused=</b> "+disused+"<br>"+
+                "<b>abandoned=</b> "+aband+"<br>"+
+                "<b>access=</b> "+access+"<br>"+
+                "<b>drinking_water=</b> "+drinking_water+"<br>"+
+                "<b>operator=</b> "+operator+"<br>"+
+                "<b>operator:type=</b> "+op_type+"<br>"+
+                "<b>name=</b> "+name+"<br>"+
+                "<b>source=</b> "+source+"<br>"+
+                "<b>note=</b> "+note+"<br>"+
+                "<b>fixme=</b> "+fixme+"<br><br>"+
+
+                "<b><u>rasmataonlus tags</u></b><br><br>"+
+
+                "<b>water_well_type=</b> "+ww_type+"<br>"+
+                "<b>top_type=</b> "+top_type+"<br>"+
+                "<b>manual_pump_type=</b> "+m_pump_type+"<br>"+
+                "<b>image=</b> "+image+"<br><br>"+
+
+                "<b><u>MVP Columbia University tags</u></b><br><br>"+
+
+                "<b>ele=</b> "+ele+"<br>"+
+                "<b>grid=</b> "+grid+"<br>"+
+                "<b>district=</b> "+district+"<br>"+
+                "<b>region=</b> "+region+"<br>"+
+                "<b>operational_status=</b> "+operational_status+"<br>"+
+                "<b>disused=</b> "+disused+"<br>"+
+                "<b>pipe_connection=</b> "+pipe_connection+"<br>"+
+                "<b>seasonal=</b> "+seasonal+"<br>"+
+                "<b>source_date=</b> "+source_date+"<br>"+
+                "<b>source_ele=</b> "+source_ele+"<br>"+
+                "<b>water_wells_source_type=</b> "+ww_source_type+"<br>"
+                );
+	  	}
+	  }).addTo(map);
+
+
+	  // Mapbox Streets
+//---------------
+var mapboxTilesStreet = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+    })
+
+// Mapbox Medieval
+// ---------------
+var mapboxTilesMedieval = L.tileLayer('https://{s}.tiles.mapbox.com/v3/spatial.b625e395/{z}/{x}/{y}.png', {
+        attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
+    }); 
+
+// Creo due oggetti con i riferimenti rispettivamente ai BaseLayers ed ai FeatureLayers
+    var baseMaps={
+        "Sfondo OSM": baseLayer,
+        "Sfondo Mapbox Streets": mapboxTilesStreet,
+        "Sfondo Mapbox Medieval": mapboxTilesMedieval
+    };
+    var featureLayers={
+        "water well": wwMarker,
+        "water well Nanoro" : singleMarker
+    };
+    // Creo i controlli
+    L.control.layers(baseMaps, featureLayers).addTo(map);
+    // Per un metodo moolto più succinto (che usa però Mapbox.js) guardare questo link: https://www.mapbox.com/mapbox.js/example/v1.0.0/toggle-baslayers/
+
+
+    //var markers = new L.MarkerClusterGroup();
+//markers.addLayer(wwMarker);
+//... Add more layers ...
+//map.addLayer(markers);
+	</script>
+
+</body>
+</html>
