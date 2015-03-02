@@ -71,88 +71,30 @@ var hash = L.hash(map);
 	});
 
 
+var propertiesToShow=['@id','man_made','pump','condition','disused','abandoned',
+       'access','operator','operator:type','name','fixme','water_well:type','top_type','manual_pump:type','image','ele','grid_proximity',
+       'is_in:district','is_in:region','operational_status','pipe_connection','seasonal','source_date','source_ele','water_wells:source_type'];
+
+
 var markers = new L.MarkerClusterGroup();
 
 microAjax('water_well.geojson',function (res) { 
 var water_well=JSON.parse(res);
 	// Dati GeoJSON
+
 water_well.features.forEach(function(well)
 {
-console.log(well);
+            var text="";
+            //console.log(well);
 	  		lat = well.geometry.coordinates[0];
 	  		lng = well.geometry.coordinates[1];
-            //come si deve fare per eliminare tutto quello che segue e listare di volta in volta solo le proprietà definite?
-            id = well.id;
-            man_made = well.properties.man_made;
-            pump = well.properties.pump;
-            condition = well.properties.condition;
-            disused = well.properties.disused;
-            aband = well.properties.abandoned;
-            access = well.properties.access;
-            drinking_water = well.properties.drinking_water;
-            operator = well.properties.operator;
-            op_type = well.properties.operator_type;
-            name = well.properties.name;
-            source = well.properties.source;
-            note = well.properties.note;
-            fixme = well.properties.fixme;
-            //Rasmata Onlus tags
-            ww_type = well.properties.water_well_type;
-            top_type = well.properties.top_type;
-            m_pump_type = well.properties.manual_pump_type;
-            image = well.properties.image;
-            // MVP Columbia Universiti tags
-            ele = well.properties.ele;
-            grid = well.properties.grid_proximity;
-            district = well.properties.is_in_district;
-            region = well.properties.is_in_region;
-            operational_status = well.properties.operational_status;
-            pipe_connection = well.properties.pipe_connection;
-            seasonal = well.properties.seasonal;
-            source_date = well.properties.source_date;
-            source_ele = well.properties.source_ele;
-            ww_source_type = well.properties.water_wells_source_type;
-	  		
+
+            for (var properties in well.properties){
+                if (propertiesToShow.indexOf(properties)==-1) continue;
+                text+="<b>"+properties+":</b>"+well.properties[properties]+"<br/>";
+            }
             var mrkr= L.marker([lng,lat], {icon: wwIcon}).bindPopup(
-                "<b>id=</b> <a target='_blank' href='//www.openstreetmap.org/"+id+"'>"+id+"</a><br>"+
-                "<b>man_made=</b> "+man_made+"<br>"+
-                "<b>position=</b> lat:"+lat+" lon:"+lng+"<br><br>"+
-
-                "<b><u>common tags</u></b><br><br>"+
-
-                "<b>pump=</b> "+pump+"<br>"+
-                "<b>condition=</b> "+condition+"<br>"+
-                "<b>disused=</b> "+disused+"<br>"+
-                "<b>abandoned=</b> "+aband+"<br>"+
-                "<b>access=</b> "+access+"<br>"+
-                "<b>drinking_water=</b> "+drinking_water+"<br>"+
-                "<b>operator=</b> "+operator+"<br>"+
-                "<b>operator:type=</b> "+op_type+"<br>"+
-                "<b>name=</b> "+name+"<br>"+
-                "<b>source=</b> "+source+"<br>"+
-                "<b>note=</b> "+note+"<br>"+
-                "<b>fixme=</b> "+fixme+"<br><br>"+
-
-                "<b><u>rasmataonlus tags</u></b><br><br>"+
-
-                "<b>water_well_type=</b> "+ww_type+"<br>"+
-                "<b>top_type=</b> "+top_type+"<br>"+
-                "<b>manual_pump_type=</b> "+m_pump_type+"<br>"+
-                "<b>image=</b> "+image+"<br><br>"+
-
-                "<b><u>MVP Columbia University tags</u></b><br><br>"+
-
-                "<b>ele=</b> "+ele+"<br>"+
-                "<b>grid=</b> "+grid+"<br>"+
-                "<b>district=</b> "+district+"<br>"+
-                "<b>region=</b> "+region+"<br>"+
-                "<b>operational_status=</b> "+operational_status+"<br>"+
-                "<b>disused=</b> "+disused+"<br>"+
-                "<b>pipe_connection=</b> "+pipe_connection+"<br>"+
-                "<b>seasonal=</b> "+seasonal+"<br>"+
-                "<b>source_date=</b> "+source_date+"<br>"+
-                "<b>source_ele=</b> "+source_ele+"<br>"+
-                "<b>water_wells_source_type=</b> "+ww_source_type+"<br>"
+                text
                 );
         mrkr.addTo(markers);
 	  	});
