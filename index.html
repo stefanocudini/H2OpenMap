@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset=utf-8 />
-	<title>H2OOpenMap</title>
-	<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <meta charset=utf-8 />
+    <title>H2OpenMap</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <link rel="stylesheet" href="basic_stylesheet.css" type="text/css" media="all">
 
 <script type="text/javascript">
@@ -16,12 +16,12 @@ function microAjax(B,A){this.bindFunction=function(E,D){return function(){return
     <div id='menu'>
     <a href="../">back to H2OpenMap web site</a>
     </div>
-	<div id='map'></div>
-	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+    <div id='map'></div>
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
     <!-- leaflet.markercluster -->
 <!---->
-<script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/leaflet.markercluster.js'></script>
+<script src='leaflet.markercluster.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.css' rel='stylesheet' />
 <link href='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v0.4.0/MarkerCluster.Default.css' rel='stylesheet' />
 <script src='https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
@@ -51,57 +51,62 @@ var hash = L.hash(map);
     });
 
     // Oggetto marker
-	var singleMarker = L.marker([12.6923891, -2.1997114], {
-		icon:singleIcon
-	})
-	    .bindPopup('<b>Node 3315201454</b><br>Tags:<br>access=yes<br>drinking_water=yes<br>man_made=water_well<br>pump=manual<br>source=Rasmata Onlus<br><br>Coordinates:<br>12.6923891  -2.1997114 (lat,lon)')
-	    .openPopup()
-	    .addTo(map)
+    /*var singleMarker = L.marker([12.6923891, -2.1997114], {
+        icon:singleIcon
+    })
+        .bindPopup('<b>Node 3315201454</b><br>Tags:<br>access=yes<br>drinking_water=yes<br>man_made=water_well<br>pump=manual<br>source=Rasmata Onlus<br><br>Coordinates:<br>12.6923891  -2.1997114 (lat,lon)')
+        .openPopup()
+        .addTo(map)
+    */
 
-
-	// Icona GeoJSON
-	var wwIcon = L.icon ({
-	    iconUrl: 'img/water_tap32.png',
+    // Icona GeoJSON
+    var wwIcon = L.icon ({
+        iconUrl: 'img/water_tap32.png',
     //  shadowUrl: 'img/chose_one.png', // not defined yet......
-	    iconSize:     [20, 20], // size of the icon
-	    shadowSize:   [20, 20], // size of the shadow
-	    iconAnchor:   [0, 0 ], // point of the icon which will correspond to marker's location
-	    shadowAnchor: [0, 0],  // the same for the shadow
-	    popupAnchor:  [10, 0] // point from which the popup should open relative to the iconAnchor
-	});
+        iconSize:     [20, 20], // size of the icon
+        shadowSize:   [20, 20], // size of the shadow
+        iconAnchor:   [0, 0 ], // point of the icon which will correspond to marker's location
+        shadowAnchor: [0, 0],  // the same for the shadow
+        popupAnchor:  [10, 0] // point from which the popup should open relative to the iconAnchor
+    });
 
-
-var propertiesToShow=['@id','man_made','pump','condition','disused','abandoned',
+/*
+var propertiesToShow=['@id' ,'man_made','pump','condition','disused','abandoned',
        'access','operator','operator:type','name','fixme','water_well:type','top_type','manual_pump:type','image','ele','grid_proximity',
        'is_in:district','is_in:region','operational_status','pipe_connection','seasonal','source_date','source_ele','water_wells:source_type'];
+*/
+
+var propertiesToShow=['@id'];
 
 
 var markers = new L.MarkerClusterGroup();
 
-microAjax('water_well.geojson',function (res) { 
+microAjax('data/water_well_west_africa.geojson',function (res) { 
 var water_well=JSON.parse(res);
-	// Dati GeoJSON
+    // Dati GeoJSON
 
 water_well.features.forEach(function(well)
 {
             var text="";
             //console.log(well);
-	  		lat = well.geometry.coordinates[0];
-	  		lng = well.geometry.coordinates[1];
+            lat = well.geometry.coordinates[0];
+            lng = well.geometry.coordinates[1];
+            id = well.id;
 
             for (var properties in well.properties){
-                if (propertiesToShow.indexOf(properties)==-1) continue;
-                text+="<b>"+properties+":</b>"+well.properties[properties]+"<br/>";
+                if (propertiesToShow.indexOf(properties)!==-1) continue;
+                text+="<b>"+properties+"=</b> "+well.properties[properties]+"<br/>";
             }
             var mrkr= L.marker([lng,lat], {icon: wwIcon}).bindPopup(
+                "<b>id=</b> <a target='_blank' href='//www.openstreetmap.org/"+id+"'>"+id+"</a><br>"+
                 text
                 );
         mrkr.addTo(markers);
-	  	});
+        });
 map.addLayer(markers);
 });
 
-	  // Mapbox Streets
+      // Mapbox Streets
 //---------------
 var mapboxTilesStreet = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-i86nkdio/{z}/{x}/{y}.png', {
         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
@@ -127,7 +132,7 @@ var mapboxTilesMedieval = L.tileLayer('https://{s}.tiles.mapbox.com/v3/spatial.b
     L.control.layers(baseMaps, featureLayers).addTo(map);
     // Per un metodo moolto più succinto (che usa però Mapbox.js) guardare questo link: https://www.mapbox.com/mapbox.js/example/v1.0.0/toggle-baslayers/
 
-	</script>
+    </script>
 
 </body>
 </html>
