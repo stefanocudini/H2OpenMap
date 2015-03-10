@@ -112,9 +112,9 @@ var mapboxTilesStreet = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.ma
         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
     })
 
-// Mapbox Medieval
+// Mapbox Satellite
 // ---------------
-var mapboxTilesMedieval = L.tileLayer('https://{s}.tiles.mapbox.com/v3/spatial.b625e395/{z}/{x}/{y}.png', {
+var mapboxTilesSatellite = L.tileLayer('https://{s}.tiles.mapbox.com/v3/examples.map-igb471ik/{z}/{x}/{y}.png', {
         attribution: '<a href="http://www.mapbox.com/about/maps/" target="_blank">Terms &amp; Feedback</a>'
     }); 
 
@@ -122,7 +122,7 @@ var mapboxTilesMedieval = L.tileLayer('https://{s}.tiles.mapbox.com/v3/spatial.b
     var baseMaps={
         "Sfondo OSM": baseLayer,
         "Sfondo Mapbox Streets": mapboxTilesStreet,
-        "Sfondo Mapbox Medieval": mapboxTilesMedieval
+        "Sfondo Mapbox Satellite": mapboxTilesSatellite
     };
     var featureLayers={
         "water well": markers,
