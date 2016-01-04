@@ -1,0 +1,86 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html style="" xmlns="http://www.w3.org/1999/xhtml"><head> 
+<title>Leaflet Dynamic JSON Layer</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<link rel="stylesheet" href="dyn/leaflet.css">
+<link rel="stylesheet" href="dyn/style.css">
+</head>
+<body class="">
+
+<div style="position:relative;float:left">
+	<div tabindex="0" style="position: relative;" class="leaflet-container leaflet-fade-anim" id="map">
+		<div style="transform: translate(576px, -275px);" class="leaflet-map-pane">
+			<div class="leaflet-tile-pane">
+			<div class="leaflet-layer">
+			<div style="" class="leaflet-tile-container leaflet-zoom-animated"></div>
+			<div style="" class="leaflet-tile-container leaflet-zoom-animated"></div>
+		</div>
+	</div>
+<div class="leaflet-objects-pane">
+	<div class="leaflet-shadow-pane"></div>
+	<div class="leaflet-overlay-pane"></div>
+	<div class="leaflet-marker-pane"></div>
+	<div class="leaflet-popup-pane"></div>
+</div>
+</div>
+<div class="leaflet-control-container">
+	<div class="leaflet-top leaflet-left">
+		<div class="leaflet-control-zoom leaflet-bar leaflet-control">
+			<a title="Zoom in" href="#" class="leaflet-control-zoom-in">+</a>
+			<a title="Zoom out" href="#" class="leaflet-control-zoom-out leaflet-disabled">-</a>
+		</div>
+	</div>
+	<div class="leaflet-top leaflet-right"></div>
+	<div class="leaflet-bottom leaflet-left"></div>
+	<div class="leaflet-bottom leaflet-right">
+		<div class="leaflet-control-attribution leaflet-control">
+			<a href="http://leafletjs.com/" title="A JS library for interactive maps">Leaflet</a>
+		</div>
+	</div>
+</div>
+</div>
+<div style="display: none;" id="loader"></div>
+</div>
+<script src="dyn/ga.js" async="" type="text/javascript"></script>
+<script src="dyn/leaflet.js"></script>
+<script src="dyn/leaflet-layerjson.js"></script>
+<script>
+
+	var map = L.map('map', {
+			zoom: 10,
+			minZoom:5,
+			center: new L.latLng([12.790, -1.648]),
+			layers: L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+		}),
+		loader = L.DomUtil.get('loader');
+
+	L.layerJSON({
+		url: 'http://overpass-api.de/api/interpreter?data=[out:json];node({lat1},{lon1},{lat2},{lon2})[man_made=water_well];out;',
+		propertyItems: 'elements',
+		propertyTitle: 'tags.name',
+		propertyLoc: ['lat','lon'],
+		buildIcon: function(data, title) {
+			return new L.Icon({
+				iconUrl:'water_tap32.png',
+				iconSize: new L.Point(32, 32),
+				iconAnchor: new L.Point(18, 32),
+				popupAnchor: new L.Point(0, -32)
+			});
+		},
+		buildPopup: function(data, marker) {
+			return data.tags.name || null;
+		}
+	})
+	.on('dataloading',function(e) {
+		loader.style.display = 'block';
+	})
+	.on('dataloaded',function(e) {
+		loader.style.display = 'none';
+	})
+	.addTo(map);
+
+</script>
+
+
+</body></html>
