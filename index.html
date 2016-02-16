@@ -70,7 +70,14 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
   var geojson = L.geoJson(remoteData, {
       pointToLayer: function (feature, latlng) {
         var icon = chooseIcon(feature['properties']);
-        return L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
+        var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
+        var markerText = '';
+        markerText+='<img src="img/'+feature['properties']['ref:h2openmap']+'.jpg" onerror="javascript:this.src=\'img/india.png\'" style="width:100px;height:100px;"/>';
+        markerText+='<p>Survey date: '+feature['properties']['survey:date']+'</p>';
+        if(feature['properties']['water_well:size'] != '')
+            markerText+='<p>Size: '+feature['properties']['water_well:size']+'</p>';
+        marker.bindPopup(markerText);
+        return marker;
     }
   }).addTo(map);
   
