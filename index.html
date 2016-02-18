@@ -31,10 +31,16 @@ var h2icon = L.Icon.extend({
 });
 
 function chooseIcon(feature) {
-    var drinkable = 'no';
-    if(feature['drinking_water'] == 'yes') {
-        drinkable = 'yes';
+    var drinkable = 'unknown';
+
+    if(feature['drinking_water'] == 'yes' || feature['drinking_water'] == 'no') {
+        drinkable = feature['drinking_water'];
     }
+
+    if(feature['drinking_water'] == 'no') {
+        drinkable = 'no';
+    }
+
     var dry = 'no';
     if(feature['dry'] == 'yes') {
         dry = 'yes';
@@ -57,7 +63,10 @@ function chooseIcon(feature) {
         featureType = 'tap';
     }
 
-    return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
+    if (drinkable == 'unknown')
+        return 'icons/'+featureType+'_'+drinkable+'.png';
+    else
+        return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
 var map = L.map('map');
@@ -72,10 +81,17 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
         var icon = chooseIcon(feature['properties']);
         var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
         var markerText = '';
-        markerText+='<img src="img/'+feature['properties']['ref:h2openmap']+'.jpg" onerror="javascript:this.src=\'img/india.png\'" style="width:100px;height:100px;"/>';
+        var image = feature['properties']['img'];
+        if (image === null) image = 'default.png';
+        markerText+='<img src="img/'+image+'" style="width:100px;height:100px;"/>';
+        var description = feature['properties']['description'];
+        if (description === null) description = '';
+        markerText+='<p>'+description+'</p>';
         markerText+='<p>Survey date: '+feature['properties']['survey:date']+'</p>';
+
         if(feature['properties']['water_well:size'] != '')
             markerText+='<p>Size: '+feature['properties']['water_well:size']+'</p>';
+
         marker.bindPopup(markerText);
         return marker;
     }

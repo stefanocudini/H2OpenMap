@@ -1,7 +1,7 @@
 <?php
 
 function get_wells() {
-    $query = "SELECT * FROM h2openmap_field_data";
+    $query = "SELECT d.*,i.description,i.img FROM h2openmap_field_data d LEFT JOIN h2openmap_field_data_information i ON d.'ref:h2openmap' = i.'ref:h2openmap'";
     $db = new PDO('sqlite:h2openmap.db');
     $res = $db->query($query);
     $geoj=["type"=>"FeatureCollection","features"=>[]];
