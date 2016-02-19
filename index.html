@@ -1,153 +1,76 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html>
-<head>
-    <meta charset=utf-8 />
-    <title>H2OpenMap</title>
-    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+	<head>
+		<title>Super Simple lightbox Window</title>
+		<style>
+		#lightbox {
+			position:fixed;
+			top:0; 
+			left:0; 
+			width:100%; 
+			height:100%; 
+			background:url(overlay.png) repeat; 
+			text-align:center;
+			vertical-align: center;
+			z-index: 999;
+		}
+		#lightbox #content {
+			margin-top: 50px;
+		}
+		#lightbox img {
+			box-shadow:0 0 25px #111;
+			-webkit-box-shadow:0 0 25px #111;
+			-moz-box-shadow:0 0 25px #111;
+			max-width:940px;
+		}
+		</style>
+	</head>
+	<body>
 
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
-    <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+				<a href="http://farm7.static.flickr.com/6130/5935338876_47b61c93a5.jpg" class="lightbox_trigger">
+				Picture 1
+				</a>
 
-    <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
-
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js'></script>
-
-    <style>
-    #map {width: 100%; height:500px;}
-    </style>
-</head>
-<body>
-
-<div id="map">
-</div>
-
+<script src="http://code.jquery.com/jquery-1.6.2.min.js"></script>
 <script>
-var h2icon = L.Icon.extend({
-    options: {
-        iconSize:     [20, 20],
-        iconAnchor:   [10, 20],
-        popupAnchor:  [0, -20]
-    }
+jQuery(document).ready(function($) {
+	
+	$('.lightbox_trigger').click(function(e) {
+		
+		//prevent default action (hyperlink)
+		e.preventDefault();
+		//Get clicked link href
+		var image_href = $(this).attr("href");
+		if ($('#lightbox').length > 0) { // #lightbox exists
+			
+			//place href as img src value
+			$('#content').html('<img src="' + image_href + '" />');
+		   	
+			//show lightbox window - you could use .show('fast') for a transition
+			$('#lightbox').show();
+		}
+		else { //#lightbox does not exist - create and insert (runs 1st time only)
+			
+		//create HTML markup for lightbox window
+			var lightbox = 
+			'<div id="lightbox">' +
+				'<div id="content">' + //insert clicked link's href into img src
+					'<img src="' + image_href +'" />' +
+				'</div>' +	
+			'</div>';
+				
+		//insert lightbox HTML into page
+			$('body').append(lightbox);
+		}
+		
+	});
+	
+	//Click anywhere on the page to get rid of lightbox window
+	$('#lightbox').live('click', function() { 
+		$('#lightbox').hide();
+	});
+
 });
-
-function chooseIcon(feature) {
-    var drinkable = 'unknown';
-
-    if(feature['drinking_water'] == 'yes' || feature['drinking_water'] == 'no') {
-        drinkable = feature['drinking_water'];
-    }
-
-    if(feature['drinking_water'] == 'no') {
-        drinkable = 'no';
-    }
-
-    var dry = 'no';
-    if(feature['dry'] == 'yes') {
-        dry = 'yes';
-    }
-    var featureType = 'well';
-
-    if(feature['pump:manual'] == 'flywheel') {
-        featureType = 'flywheel';
-    }
-
-    if(feature['pump:manual'] == 'pedal') {
-        featureType = 'pedal';
-    }
-
-    if(feature['pump:manual'] == 'lever') {
-        featureType = 'lever';
-    }
-
-    if(feature['amenity'] == 'drinking_water') {
-        featureType = 'tap';
-    }
-
-    if (drinkable == 'unknown')
-        return 'icons/'+featureType+'_'+drinkable+'.png';
-    else
-        return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
-}
-
-var map = L.map('map');
-
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-
-$.getJSON('api.php', {'wells': '1'}, function(remoteData){
-  var geojson = L.geoJson(remoteData, {
-      pointToLayer: function (feature, latlng) {
-        var icon = chooseIcon(feature['properties']);
-        var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
-        var markerText = '';
-        var image = feature['properties']['img'];
-        if (image === null) image = 'default.png';
-        markerText+='<img src="img/'+image+'" style="width:100px;height:100px;"/>';
-        var description = feature['properties']['description'];
-        if (description === null) description = '';
-        
-        markerText+='<p><b>survey date =</b> '+feature['properties']['survey:date']+'<br/>';
-
-        if(feature['properties']['ref:h2openmap'] != '')
-            markerText+='<b>ref h2openmap =</b> '+feature['properties']['ref:h2openmap']+'<br/>';
-
-        if(feature['properties']['drinking_water'] != '')
-            markerText+='<b>drinking water =</b> '+feature['properties']['drinking_water']+'<br/>';
-
-        if(feature['properties']['access'] != '')
-            markerText+='<b>access =</b> '+feature['properties']['access']+'<br/>';
-
-        if(feature['properties']['fee'] != '')
-            markerText+='<b>fee =</b> '+feature['properties']['fee']+'<br/>';
-
-        if(feature['properties']['name'] != '')
-            markerText+='<b>name =</b> '+feature['properties']['name']+'<br/>';
-
-        if(feature['properties']['water_well:size'] != '')
-            markerText+='<b>water well size =</b> '+feature['properties']['water_well:size']+'<br/>';
-
-        if(feature['properties']['water_well:top'] != '')
-            markerText+='<b>water well top =</b> '+feature['properties']['water_well:top']+'<br/>';
-
-        if(feature['properties']['pump'] != '')
-            markerText+='<b>pump =</b> '+feature['properties']['pump']+'<br/>';
-
-        if(feature['properties']['pump:manual'] != '')
-            markerText+='<b>pump manual =</b> '+feature['properties']['pump:manual']+'<br/>';
-
-        if(feature['properties']['condition'] != '')
-            markerText+='<b>condition =</b> '+feature['properties']['condition']+'<br/>';
-
-        if(feature['properties']['disused'] != '')
-            markerText+='<b>disused =</b> '+feature['properties']['disused']+'<br/>';
-
-        if(feature['properties']['abandoned'] != '')
-            markerText+='<b>abandoned =</b> '+feature['properties']['abandoned']+'<br/>';
-
-        if(feature['properties']['dry'] != '')
-            markerText+='<b>dry =</b> '+feature['properties']['dry']+'<br/>';
-
-        if(feature['properties']['operator'] != '')
-            markerText+='<b>operator =</b> '+feature['properties']['operator']+'<br/>';
-
-        if(feature['properties']['operator:type'] != '')
-            markerText+='<b>operator type =</b> '+feature['properties']['operator:type']+'<br/>';
-
-        if(feature['properties']['fixme'] != '')
-            markerText+='<b>fixme:</b> '+feature['properties']['fixme']+'<br/>';
-
-        markerText+='</p>';
-        
-        markerText+='<p>'+description+'</p>'; //campo note
-
-        marker.bindPopup(markerText);
-        return marker;
-    }
-  }).addTo(map);
-  
-map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
-})
 </script>
 </body>
 </html>
