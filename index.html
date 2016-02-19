@@ -12,6 +12,8 @@
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js'></script>
 
+    <script src='js/leaflet-layerjson.min.js'></script>
+
     <style>
     #map {
     position: fixed;
@@ -75,83 +77,95 @@ function chooseIcon(feature) {
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
+function buildPopup(feature) {
+        var markerText = '';
+        var image = feature['img'];
+        if (image === null || image == '') image = 'default.png';
+        markerText+='<img src="img/'+image+'" style="width:150px;height:150px;"/>';
+        var description = feature['description'];
+        if (description === null) description = '';
+        
+        markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
+
+        if(feature['ref:h2openmap'] != '')
+            markerText+='<b>ref h2openmap =</b> '+feature['ref:h2openmap']+'<br/>';
+
+        if(feature['drinking_water'] != '')
+            markerText+='<b>drinking water =</b> '+feature['drinking_water']+'<br/>';
+
+        if(feature['access'] != '')
+            markerText+='<b>access =</b> '+feature['access']+'<br/>';
+
+        if(feature['fee'] != '')
+            markerText+='<b>fee =</b> '+feature['fee']+'<br/>';
+
+        if(feature['name'] != '')
+            markerText+='<b>name =</b> '+feature['name']+'<br/>';
+
+        if(feature['water_well:size'] != '')
+            markerText+='<b>water well size =</b> '+feature['water_well:size']+'<br/>';
+
+        if(feature['water_well:top'] != '')
+            markerText+='<b>water well top =</b> '+feature['water_well:top']+'<br/>';
+
+        if(feature['pump'] != '')
+            markerText+='<b>pump =</b> '+feature['pump']+'<br/>';
+
+        if(feature['pump:manual'] != '')
+            markerText+='<b>pump manual =</b> '+feature['pump:manual']+'<br/>';
+
+        if(feature['condition'] != '')
+            markerText+='<b>condition =</b> '+feature['condition']+'<br/>';
+
+        if(feature['disused'] != '')
+            markerText+='<b>disused =</b> '+feature['disused']+'<br/>';
+
+        if(feature['abandoned'] != '')
+            markerText+='<b>abandoned =</b> '+feature['abandoned']+'<br/>';
+
+        if(feature['dry'] != '')
+            markerText+='<b>dry =</b> '+feature['dry']+'<br/>';
+
+        if(feature['operator'] != '')
+            markerText+='<b>operator =</b> '+feature['operator']+'<br/>';
+
+        if(feature['operator:type'] != '')
+            markerText+='<b>operator type =</b> '+feature['operator:type']+'<br/>';
+
+        if(feature['fixme'] != '')
+            markerText+='<b>fixme:</b> '+feature['fixme']+'<br/>';
+
+        markerText+='</p>';
+        
+        markerText+='<p>'+description+'</p>'; //campo note
+
+        return markerText;
+}
+
+
 var map = L.map('map');
 
-L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+var osmTile = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+
+var baseMaps= {"OpenStreetMap": osmTile};
+var overlayMaps={};
+
+var layerControl = L.control.layers(baseMaps, overlayMaps).addTo(map);
 
 $.getJSON('api.php', {'wells': '1'}, function(remoteData){
   var geojson = L.geoJson(remoteData, {
       pointToLayer: function (feature, latlng) {
         var icon = chooseIcon(feature['properties']);
         var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
-        var markerText = '';
-        var image = feature['properties']['img'];
-        if (image === null || image == '') image = 'default.png';
-        markerText+='<img src="img/'+image+'" style="width:150px;height:150px;"/>';
-        var description = feature['properties']['description'];
-        if (description === null) description = '';
-        
-        markerText+='<p><b>survey date =</b> '+feature['properties']['survey:date']+'<br/>';
-
-        if(feature['properties']['ref:h2openmap'] != '')
-            markerText+='<b>ref h2openmap =</b> '+feature['properties']['ref:h2openmap']+'<br/>';
-
-        if(feature['properties']['drinking_water'] != '')
-            markerText+='<b>drinking water =</b> '+feature['properties']['drinking_water']+'<br/>';
-
-        if(feature['properties']['access'] != '')
-            markerText+='<b>access =</b> '+feature['properties']['access']+'<br/>';
-
-        if(feature['properties']['fee'] != '')
-            markerText+='<b>fee =</b> '+feature['properties']['fee']+'<br/>';
-
-        if(feature['properties']['name'] != '')
-            markerText+='<b>name =</b> '+feature['properties']['name']+'<br/>';
-
-        if(feature['properties']['water_well:size'] != '')
-            markerText+='<b>water well size =</b> '+feature['properties']['water_well:size']+'<br/>';
-
-        if(feature['properties']['water_well:top'] != '')
-            markerText+='<b>water well top =</b> '+feature['properties']['water_well:top']+'<br/>';
-
-        if(feature['properties']['pump'] != '')
-            markerText+='<b>pump =</b> '+feature['properties']['pump']+'<br/>';
-
-        if(feature['properties']['pump:manual'] != '')
-            markerText+='<b>pump manual =</b> '+feature['properties']['pump:manual']+'<br/>';
-
-        if(feature['properties']['condition'] != '')
-            markerText+='<b>condition =</b> '+feature['properties']['condition']+'<br/>';
-
-        if(feature['properties']['disused'] != '')
-            markerText+='<b>disused =</b> '+feature['properties']['disused']+'<br/>';
-
-        if(feature['properties']['abandoned'] != '')
-            markerText+='<b>abandoned =</b> '+feature['properties']['abandoned']+'<br/>';
-
-        if(feature['properties']['dry'] != '')
-            markerText+='<b>dry =</b> '+feature['properties']['dry']+'<br/>';
-
-        if(feature['properties']['operator'] != '')
-            markerText+='<b>operator =</b> '+feature['properties']['operator']+'<br/>';
-
-        if(feature['properties']['operator:type'] != '')
-            markerText+='<b>operator type =</b> '+feature['properties']['operator:type']+'<br/>';
-
-        if(feature['properties']['fixme'] != '')
-            markerText+='<b>fixme:</b> '+feature['properties']['fixme']+'<br/>';
-
-        markerText+='</p>';
-        
-        markerText+='<p>'+description+'</p>'; //campo note
-
+        var markerText = buildPopup(feature['properties']);
         marker.bindPopup(markerText);
         return marker;
     }
   }).addTo(map);
-  
+
+layerControl.addOverlay(geojson, "h2openmap campaigns");
 map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
 })
 </script>
