@@ -86,11 +86,60 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
         markerText+='<img src="img/'+image+'" style="width:100px;height:100px;"/>';
         var description = feature['properties']['description'];
         if (description === null) description = '';
-        markerText+='<p>'+description+'</p>';
-        markerText+='<p>Survey date: '+feature['properties']['survey:date']+'</p>';
+        
+        markerText+='<p><b>survey date =</b> '+feature['properties']['survey:date']+'<br/>';
+
+        if(feature['properties']['ref:h2openmap'] != '')
+            markerText+='<b>ref h2openmap =</b> '+feature['properties']['ref:h2openmap']+'<br/>';
+
+        if(feature['properties']['drinking_water'] != '')
+            markerText+='<b>drinking water =</b> '+feature['properties']['drinking_water']+'<br/>';
+
+        if(feature['properties']['access'] != '')
+            markerText+='<b>access =</b> '+feature['properties']['access']+'<br/>';
+
+        if(feature['properties']['fee'] != '')
+            markerText+='<b>fee =</b> '+feature['properties']['fee']+'<br/>';
+
+        if(feature['properties']['name'] != '')
+            markerText+='<b>name =</b> '+feature['properties']['name']+'<br/>';
 
         if(feature['properties']['water_well:size'] != '')
-            markerText+='<p>Size: '+feature['properties']['water_well:size']+'</p>';
+            markerText+='<b>water well size =</b> '+feature['properties']['water_well:size']+'<br/>';
+
+        if(feature['properties']['water_well:top'] != '')
+            markerText+='<b>water well top =</b> '+feature['properties']['water_well:top']+'<br/>';
+
+        if(feature['properties']['pump'] != '')
+            markerText+='<b>pump =</b> '+feature['properties']['pump']+'<br/>';
+
+        if(feature['properties']['pump:manual'] != '')
+            markerText+='<b>pump manual =</b> '+feature['properties']['pump:manual']+'<br/>';
+
+        if(feature['properties']['condition'] != '')
+            markerText+='<b>condition =</b> '+feature['properties']['condition']+'<br/>';
+
+        if(feature['properties']['disused'] != '')
+            markerText+='<b>disused =</b> '+feature['properties']['disused']+'<br/>';
+
+        if(feature['properties']['abandoned'] != '')
+            markerText+='<b>abandoned =</b> '+feature['properties']['abandoned']+'<br/>';
+
+        if(feature['properties']['dry'] != '')
+            markerText+='<b>dry =</b> '+feature['properties']['dry']+'<br/>';
+
+        if(feature['properties']['operator'] != '')
+            markerText+='<b>operator =</b> '+feature['properties']['operator']+'<br/>';
+
+        if(feature['properties']['operator:type'] != '')
+            markerText+='<b>operator type =</b> '+feature['properties']['operator:type']+'<br/>';
+
+        if(feature['properties']['fixme'] != '')
+            markerText+='<b>fixme:</b> '+feature['properties']['fixme']+'<br/>';
+
+        markerText+='</p>';
+        
+        markerText+='<p>'+description+'</p>'; //campo note
 
         marker.bindPopup(markerText);
         return marker;
