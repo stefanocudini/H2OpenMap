@@ -14,7 +14,14 @@
 
     <script src='js/leaflet-layerjson.min.js'></script>
 
+    <link rel="stylesheet" href="css/easy-button.css" />
+    <script src='js/easy-button.js'></script>
+
     <style>
+    * {
+    font-family: sans-serif;
+    }
+
     #map {
     position: fixed;
     top: 20px;
@@ -22,11 +29,27 @@
     right: 0;
     left: 0;
     }
+    #legend {
+        display:none;
+        width:300px;
+        position:absolute;
+        left:50px;
+        top:40px;
+        background-color:white;
+        padding:10px;
+    }
     </style>
 </head>
 <body>
 
 <div id="map">
+</div>
+
+<div id="legend">
+<p class="float:right"><a href="#" onclick="$('#legend').css('display','none');">Chiudi</a></p>
+<h3>Legenda</h3>
+<img src="icons/well_yes_no.png" style="display:inline-block"/> Pozzo con acqua potabile<br/>
+<img src="icons/well_unknown.png" style="display:inline-block"/> Pozzo con stato sconosciuto<br/>
 </div>
 
 <script>
@@ -77,66 +100,68 @@ function chooseIcon(feature) {
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
-function buildPopup(feature) {
+function buildPopup(feature, hasImage) {
         var markerText = '';
         var image = feature['img'];
-        if (image === null || image == '') image = 'default.png';
-        markerText+='<img src="img/'+image+'" style="width:150px;height:150px;"/>';
-        var description = feature['description'];
-        if (description === null) description = '';
+        if (image === null || image == '' || hasImage == false) image = 'default.png';
+        markerText+='<img src="img/'+image+'" style="width:150px;height:150px;"/><br/>';
         
-        markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
+        if('survey:date' in feature)
+            markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
 
-        if(feature['ref:h2openmap'] != '')
+        if('ref:h2openmap' in feature)
             markerText+='<b>ref h2openmap =</b> '+feature['ref:h2openmap']+'<br/>';
 
-        if(feature['drinking_water'] != '')
+        if('drinking_water' in feature)
             markerText+='<b>drinking water =</b> '+feature['drinking_water']+'<br/>';
 
-        if(feature['access'] != '')
+        if('access' in feature)
             markerText+='<b>access =</b> '+feature['access']+'<br/>';
 
-        if(feature['fee'] != '')
+        if('fee' in feature)
             markerText+='<b>fee =</b> '+feature['fee']+'<br/>';
 
-        if(feature['name'] != '')
+        if('name' in feature)
             markerText+='<b>name =</b> '+feature['name']+'<br/>';
 
-        if(feature['water_well:size'] != '')
+        if('water_well:size' in feature)
             markerText+='<b>water well size =</b> '+feature['water_well:size']+'<br/>';
 
-        if(feature['water_well:top'] != '')
+        if('water_well:top' in feature)
             markerText+='<b>water well top =</b> '+feature['water_well:top']+'<br/>';
 
-        if(feature['pump'] != '')
+        if('pump' in feature)
             markerText+='<b>pump =</b> '+feature['pump']+'<br/>';
 
-        if(feature['pump:manual'] != '')
+        if('pump:manual' in feature)
             markerText+='<b>pump manual =</b> '+feature['pump:manual']+'<br/>';
 
-        if(feature['condition'] != '')
+        if('condition' in feature)
             markerText+='<b>condition =</b> '+feature['condition']+'<br/>';
 
-        if(feature['disused'] != '')
+        if('disused' in feature)
             markerText+='<b>disused =</b> '+feature['disused']+'<br/>';
 
-        if(feature['abandoned'] != '')
+        if('abandoned' in feature)
             markerText+='<b>abandoned =</b> '+feature['abandoned']+'<br/>';
 
-        if(feature['dry'] != '')
+        if('dry' in feature)
             markerText+='<b>dry =</b> '+feature['dry']+'<br/>';
 
-        if(feature['operator'] != '')
+        if('operator' in feature)
             markerText+='<b>operator =</b> '+feature['operator']+'<br/>';
 
-        if(feature['operator:type'] != '')
+        if('operator:type' in feature)
             markerText+='<b>operator type =</b> '+feature['operator:type']+'<br/>';
 
-        if(feature['fixme'] != '')
+        if('fixme' in feature)
             markerText+='<b>fixme:</b> '+feature['fixme']+'<br/>';
 
         markerText+='</p>';
-        
+
+        var description = '';
+        if('description' in feature)
+            description = feature['description'];
         markerText+='<p>'+description+'</p>'; //campo note
 
         return markerText;
@@ -149,6 +174,10 @@ var osmTile = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
 
+L.easyButton( '<span class="symbol">&equiv;</span>', function(){
+  $('#legend').css('display','block');
+}).addTo(map);
+
 var baseMaps= {"OpenStreetMap": osmTile};
 var overlayMaps={};
 
@@ -159,7 +188,7 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
       pointToLayer: function (feature, latlng) {
         var icon = chooseIcon(feature['properties']);
         var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
-        var markerText = buildPopup(feature['properties']);
+        var markerText = buildPopup(feature['properties'], true);
         marker.bindPopup(markerText);
         return marker;
     }
@@ -167,7 +196,24 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
 
 layerControl.addOverlay(geojson, "h2openmap campaigns");
 map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
-})
+});
+
+	var layerjson = L.layerJSON({
+		url: 'http://overpass-api.de/api/interpreter?data=[out:json];node({lat1},{lon1},{lat2},{lon2})[man_made=water_well];out;',
+		propertyItems: 'elements',
+		propertyTitle: 'tags.man_made',
+		propertyLoc: ['lat','lon'],
+		
+		buildPopup: function(data, marker) {
+           return buildPopup(data.tags, false);
+		},
+		buildIcon: function(data, title) {
+           var icon = chooseIcon(data.tags);
+           return new h2icon( {iconUrl: icon} );
+		}
+	})
+	.addTo(map);
+    layerControl.addOverlay(layerjson, "OSM Data");
 </script>
 </body>
 </html>
