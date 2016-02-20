@@ -16,40 +16,49 @@
 
     <link rel="stylesheet" href="css/easy-button.css" />
     <script src='js/easy-button.js'></script>
-
-    <style>
-    * {
-    font-family: sans-serif;
-    }
-
-    #map {
-    position: fixed;
-    top: 20px;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    }
-    #legend {
-        display:none;
-        width:300px;
-        position:absolute;
-        left:50px;
-        top:40px;
-        background-color:white;
-        padding:10px;
-    }
-    </style>
+    <link rel="stylesheet" href="css/stylesheet.css" />
 </head>
 <body>
 
-<div id="map">
-</div>
+<div id="map"></div>
 
 <div id="legend">
-<p class="float:right"><a href="#" onclick="$('#legend').css('display','none');">Chiudi</a></p>
-<h3>Legenda</h3>
-<img src="icons/well_yes_no.png" style="display:inline-block"/> Pozzo con acqua potabile<br/>
-<img src="icons/well_unknown.png" style="display:inline-block"/> Pozzo con stato sconosciuto<br/>
+<img src="H2OpenMap_icon_2.png" style="width:100px;height:100px;" />
+<p style="float:right"><a href="#" onclick="$('#legend').css('display','none');">x</a></p>
+<h3>legend</h3>
+
+<img src="icons/flywheel_yes_no.png" style="display:inline-block"/> flyweel - drinking water yes<br/>
+<img src="icons/flywheel_no_no.png" style="display:inline-block"/> flyweel drinking - water no<br/>
+<img src="icons/flywheel_no_yes.png" style="display:inline-block"/> flyweel - no water<br/>
+<img src="icons/flywheel_unknown.png" style="display:inline-block"/> flyweel - unknow status<br/><br/>
+
+<img src="icons/lever_unknown.png" style="display:inline-block"/> lever pump - drinking water yes<br/>
+<img src="icons/lever_no_no.png" style="display:inline-block"/> lever pump - drinking water no<br/>
+<img src="icons/lever_no_yes.png" style="display:inline-block"/> lever pump - no water<br/>
+<img src="icons/lever_yes_no.png" style="display:inline-block"/> lever pump - unknow status<br/><br/>
+
+<img src="icons/pedal_yes_no.png" style="display:inline-block"/> pedal - drinking water yes<br/>
+<img src="icons/pedal_no_no.png" style="display:inline-block"/> pedal - drinking water no<br/>
+<img src="icons/pedal_no_yes.png" style="display:inline-block"/> pedal - no water<br/>
+<img src="icons/pedal_unknown.png" style="display:inline-block"/> pedal - unknow status<br/><br/>
+
+<img src="icons/pump_manual.png" style="display:inline-block"/> unknown pump<br/><br/>
+
+<img src="icons/tap_yes_no.png" style="display:inline-block"/> water tap - drinking water yes<br/>
+<img src="icons/tap_no_no.png" style="display:inline-block"/> water tap - drinking water no<br/>
+<img src="icons/tap_no_yes.png" style="display:inline-block"/> water tap - no water<br/>
+<img src="icons/tap_unknown.png" style="display:inline-block"/> water tap - unknow status<br/><br/>
+
+<img src="icons/water_well_unknown.png" style="display:inline-block"/> unknown water well<br/><br/>
+
+<img src="icons/well_yes_no.png" style="display:inline-block"/> water well - drinking water yes<br/>
+<img src="icons/well_no_no.png" style="display:inline-block"/> water well - drinking water no<br/>
+<img src="icons/well_no_yes.png" style="display:inline-block"/> water well - no water<br/>
+<img src="icons/well_unknown.png" style="display:inline-block"/> water well - unknow status<br/>
+
+<div class="note">this map is a beta version, some issue still need work. <br/>
+please refer to <a href="https://github.com/H2OpenMap" target="blank">github H2OpenMap repository </a> to join us.<br/>map made with the Stefano Sabatini great help! </div>
+
 </div>
 
 <script>
@@ -78,6 +87,10 @@ function chooseIcon(feature) {
     }
     var featureType = 'well';
 
+    if(feature['pump'] == 'manual' && feature['pump:manual'] == '') {
+        featureType = 'pump';
+    }
+
     if(feature['pump:manual'] == 'flywheel') {
         featureType = 'flywheel';
     }
@@ -94,7 +107,12 @@ function chooseIcon(feature) {
         featureType = 'tap';
     }
 
-    if (drinkable == 'unknown')
+
+
+
+    if (feature['condition'] == 'deficient' && drinkable == 'unknown')
+        return 'icons/'+featureType+'_no_yes.png';
+    else if (drinkable == 'unknown')
         return 'icons/'+featureType+'_'+drinkable+'.png';
     else
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
@@ -102,69 +120,76 @@ function chooseIcon(feature) {
 
 function buildPopup(feature, hasImage) {
         var markerText = '';
+
+        markerText+='<a href="#" class=""><img src="H2OpenMap_icon_2.png" style="width:50px;height:50px;" /></a><br/>';
+
         var image = feature['img'];
         if (image === null || image == '' || hasImage == false) image = 'default.png';
-        markerText+='<img src="img/'+image+'" style="width:150px;height:150px;"/><br/>';
+        markerText+='<a href="img/'+image+'" class=""><img src="img/'+image+'" style="width:200px;height:200px;" /></a>';
         
-        if('survey:date' in feature)
+        if(feature ['survey:date']!='')
             markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
 
-        if('ref:h2openmap' in feature)
+        //if(hasImage []!='')
+            //markerText+='<b>position =</b> '+JSON.stringify(???, null, 4);+'<br/>';
+
+        if(feature ['ref:h2openmap']!='')
             markerText+='<b>ref h2openmap =</b> '+feature['ref:h2openmap']+'<br/>';
 
-        if('drinking_water' in feature)
+        if(feature ['drinking_water']!='')
             markerText+='<b>drinking water =</b> '+feature['drinking_water']+'<br/>';
 
-        if('access' in feature)
+        if(feature ['access']!='')
             markerText+='<b>access =</b> '+feature['access']+'<br/>';
 
-        if('fee' in feature)
+        if(feature ['fee']!='')
             markerText+='<b>fee =</b> '+feature['fee']+'<br/>';
 
-        if('name' in feature)
+        if(feature ['name']!='')
             markerText+='<b>name =</b> '+feature['name']+'<br/>';
 
-        if('water_well:size' in feature)
+        if(feature ['water_well:size']!='')
             markerText+='<b>water well size =</b> '+feature['water_well:size']+'<br/>';
 
-        if('water_well:top' in feature)
+        if(feature ['water_well:top']!='')
             markerText+='<b>water well top =</b> '+feature['water_well:top']+'<br/>';
 
-        if('pump' in feature)
+        if(feature ['pump']!='')
             markerText+='<b>pump =</b> '+feature['pump']+'<br/>';
 
-        if('pump:manual' in feature)
+        if(feature ['pump:manual']!='')
             markerText+='<b>pump manual =</b> '+feature['pump:manual']+'<br/>';
 
-        if('condition' in feature)
+        if(feature ['condition']!='')
             markerText+='<b>condition =</b> '+feature['condition']+'<br/>';
 
-        if('disused' in feature)
+        if(feature ['disused']!='')
             markerText+='<b>disused =</b> '+feature['disused']+'<br/>';
 
-        if('abandoned' in feature)
+        if(feature ['abandoned']!='')
             markerText+='<b>abandoned =</b> '+feature['abandoned']+'<br/>';
 
-        if('dry' in feature)
+        if(feature ['dry']!='')
             markerText+='<b>dry =</b> '+feature['dry']+'<br/>';
 
-        if('operator' in feature)
+        if(feature ['operator']!='')
             markerText+='<b>operator =</b> '+feature['operator']+'<br/>';
 
-        if('operator:type' in feature)
+        if(feature ['operator:type']!='')
             markerText+='<b>operator type =</b> '+feature['operator:type']+'<br/>';
 
-        if('fixme' in feature)
+        if(feature ['fixme']!='')
             markerText+='<b>fixme:</b> '+feature['fixme']+'<br/>';
 
         markerText+='</p>';
 
-        var description = '';
-        if('description' in feature)
-            description = feature['description'];
-        markerText+='<p>'+description+'</p>'; //campo note
+        if (feature ['description']!='')
+        markerText+='<p><b>note = </b>'+feature ['description']+'</p>'; //campo note
+
+        markerText+='<p><a href="#" class="">download PDF</a></p>'; //da fare
 
         return markerText;
+        
 }
 
 
@@ -205,7 +230,16 @@ map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
 		propertyLoc: ['lat','lon'],
 		
 		buildPopup: function(data, marker) {
-           return buildPopup(data.tags, false);
+           var out = '';
+            for (var p in data.tags) {
+                out += '<b>'+ p + '=</b>' + data.tags[p] + '<br/>';     
+            }
+            return ("<b>id=</b> <a target='_blank' href='//www.openstreetmap.org/node/"+data.id+"'>"+data.id+"</a><br/>"
+                + out + '<br/>'
+                +'<b>Lat=</b>' + data.lat + '<br/>'
+                +'<b>Lon=</b>' + data.lon + '<br/>'
+                );
+            //return (JSON.stringify(data, null, 4));
 		},
 		buildIcon: function(data, title) {
            var icon = chooseIcon(data.tags);
