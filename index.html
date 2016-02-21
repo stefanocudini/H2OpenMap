@@ -105,9 +105,6 @@ function chooseIcon(feature) {
         featureType = 'tap';
     }
 
-
-
-
     if (feature['condition'] == 'deficient' && drinkable == 'unknown')
         return 'icons/'+featureType+'_no_yes.png';
     else if (drinkable == 'unknown')
@@ -128,8 +125,8 @@ function buildPopup(feature, hasImage) {
         if(feature ['survey:date']!='')
             markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
 
-        //if(hasImage []!='')
-            //markerText+='<b>position =</b> '+JSON.stringify(???, null, 4);+'<br/>';
+        //if(??? []!='')
+            //markerText+='<b>position =</b> '+JSON.stringify(???, null, 4);+'<br/>'; //how to show Lat Lon in this place?
 
         if(feature ['ref:h2openmap']!='')
             markerText+='<b>ref h2openmap =</b> '+feature['ref:h2openmap']+'<br/>';
@@ -189,7 +186,6 @@ function buildPopup(feature, hasImage) {
         return markerText;
         
 }
-
 
 var map = L.map('map');
 
