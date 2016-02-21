@@ -4,61 +4,55 @@
     <meta charset="utf8" />
     <title>H2OpenMap</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-hash/v0.2.1/leaflet-hash.js'></script>
-
     <script src='https://cdnjs.cloudflare.com/ajax/libs/zepto/1.1.6/zepto.min.js'></script>
-
     <script src='js/leaflet-layerjson.min.js'></script>
-
     <link rel="stylesheet" href="css/easy-button.css" />
     <script src='js/easy-button.js'></script>
     <link rel="stylesheet" href="css/stylesheet.css" />
 </head>
 <body>
-
 <div id="map"></div>
 
 <div id="legend">
-<img src="H2OpenMap_icon_2.png" style="width:100px;height:100px;" />
-<p style="float:right"><a href="#" onclick="$('#legend').css('display','none');">x</a></p>
-<h3>legend</h3>
+    <img src="H2OpenMap_icon_2.png" style="width:100px;height:100px;" />
+    <p style="float:right"><a href="#" onclick="$('#legend').css('display','none');">x</a></p>
+    <h3>legend</h3>
 
-<img src="icons/flywheel_yes_no.png" style="display:inline-block"/> flyweel - drinking water yes<br/>
-<img src="icons/flywheel_no_no.png" style="display:inline-block"/> flyweel drinking - water no<br/>
-<img src="icons/flywheel_no_yes.png" style="display:inline-block"/> flyweel - no water<br/>
-<img src="icons/flywheel_unknown.png" style="display:inline-block"/> flyweel - unknow status<br/><br/>
+    <img src="icons/flywheel_yes_no.png" style="display:inline-block"/> flyweel - drinking water yes<br/>
+    <img src="icons/flywheel_no_no.png" style="display:inline-block"/> flyweel drinking - water no<br/>
+    <img src="icons/flywheel_no_yes.png" style="display:inline-block"/> flyweel - no water<br/>
+    <img src="icons/flywheel_unknown.png" style="display:inline-block"/> flyweel - unknow status<br/>
+    <br/>
+    <img src="icons/lever_yes_no.png" style="display:inline-block"/> lever pump - drinking water yes<br/>
+    <img src="icons/lever_no_no.png" style="display:inline-block"/> lever pump - drinking water no<br/>
+    <img src="icons/lever_no_yes.png" style="display:inline-block"/> lever pump - no water<br/>
+    <img src="icons/lever_unknown.png" style="display:inline-block"/> lever pump - unknow status<br/>
+    <br/>
+    <img src="icons/pedal_yes_no.png" style="display:inline-block"/> pedal - drinking water yes<br/>
+    <img src="icons/pedal_no_no.png" style="display:inline-block"/> pedal - drinking water no<br/>
+    <img src="icons/pedal_no_yes.png" style="display:inline-block"/> pedal - no water<br/>
+    <img src="icons/pedal_unknown.png" style="display:inline-block"/> pedal - unknow status<br/>
+    <br/>
+    <img src="icons/pump_manual.png" style="display:inline-block"/> unknown pump<br/>
+    <br/>
+    <img src="icons/tap_yes_no.png" style="display:inline-block"/> water tap - drinking water yes<br/>
+    <img src="icons/tap_no_no.png" style="display:inline-block"/> water tap - drinking water no<br/>
+    <img src="icons/tap_no_yes.png" style="display:inline-block"/> water tap - no water<br/>
+    <img src="icons/tap_unknown.png" style="display:inline-block"/> water tap - unknow status<br/>
+    <br/>
+    <img src="icons/water_well_unknown.png" style="display:inline-block"/> unknown water well<br/>
+    <br/>
+    <img src="icons/well_yes_no.png" style="display:inline-block"/> water well - drinking water yes<br/>
+    <img src="icons/well_no_no.png" style="display:inline-block"/> water well - drinking water no<br/>
+    <img src="icons/well_no_yes.png" style="display:inline-block"/> water well - no water<br/>
+    <img src="icons/well_unknown.png" style="display:inline-block"/> water well - unknow status<br/>
 
-<img src="icons/lever_unknown.png" style="display:inline-block"/> lever pump - drinking water yes<br/>
-<img src="icons/lever_no_no.png" style="display:inline-block"/> lever pump - drinking water no<br/>
-<img src="icons/lever_no_yes.png" style="display:inline-block"/> lever pump - no water<br/>
-<img src="icons/lever_yes_no.png" style="display:inline-block"/> lever pump - unknow status<br/><br/>
-
-<img src="icons/pedal_yes_no.png" style="display:inline-block"/> pedal - drinking water yes<br/>
-<img src="icons/pedal_no_no.png" style="display:inline-block"/> pedal - drinking water no<br/>
-<img src="icons/pedal_no_yes.png" style="display:inline-block"/> pedal - no water<br/>
-<img src="icons/pedal_unknown.png" style="display:inline-block"/> pedal - unknow status<br/><br/>
-
-<img src="icons/pump_manual.png" style="display:inline-block"/> unknown pump<br/><br/>
-
-<img src="icons/tap_yes_no.png" style="display:inline-block"/> water tap - drinking water yes<br/>
-<img src="icons/tap_no_no.png" style="display:inline-block"/> water tap - drinking water no<br/>
-<img src="icons/tap_no_yes.png" style="display:inline-block"/> water tap - no water<br/>
-<img src="icons/tap_unknown.png" style="display:inline-block"/> water tap - unknow status<br/><br/>
-
-<img src="icons/water_well_unknown.png" style="display:inline-block"/> unknown water well<br/><br/>
-
-<img src="icons/well_yes_no.png" style="display:inline-block"/> water well - drinking water yes<br/>
-<img src="icons/well_no_no.png" style="display:inline-block"/> water well - drinking water no<br/>
-<img src="icons/well_no_yes.png" style="display:inline-block"/> water well - no water<br/>
-<img src="icons/well_unknown.png" style="display:inline-block"/> water well - unknow status<br/>
-
-<div class="note">this map is a beta version, some issue still need work. <br/>
-please refer to <a href="https://github.com/H2OpenMap" target="blank">github H2OpenMap repository </a> to join us.<br/>map made with the Stefano Sabatini great help! </div>
-
+    <div class="note">this map is a beta version, some issue still need work. <br/>
+    please refer to <a href="https://github.com/H2OpenMap" target="blank">github H2OpenMap repository </a> to join us.<br/>
+    map made with the Stefano Sabatini great help! </div>
 </div>
 
 <script>
@@ -85,9 +79,9 @@ function chooseIcon(feature) {
     if(feature['dry'] == 'yes') {
         dry = 'yes';
     }
-    var featureType = 'well';
+    var featureType = 'water_well';
 
-    if(feature['pump'] == 'manual' && feature['pump:manual'] == '') {
+    if(feature['pump'] == 'manual') {
         featureType = 'pump';
     }
 
@@ -101,6 +95,10 @@ function chooseIcon(feature) {
 
     if(feature['pump:manual'] == 'lever') {
         featureType = 'lever';
+    }
+
+    if (feature['water_well:size'] == 'large'){ //large
+        featureType = 'well'
     }
 
     if(feature['amenity'] == 'drinking_water') {
