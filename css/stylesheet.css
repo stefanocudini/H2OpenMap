@@ -35,3 +35,18 @@ a {
     background-color:#ddd;
     padding: 10px;
 }
+.search-input {
+    font-family:Courier
+}
+.search-input,
+.leaflet-control-search {
+    max-width:400px;
+}
+.symbol{
+    font-size: 18px;
+}
+#logo {
+    position:absolute;
+    left: 60px;
+    top: 10px;
+}
