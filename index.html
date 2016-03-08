@@ -12,25 +12,29 @@
     <script src='js/leaflet-search.js'></script>
     <script src='js/easy-button.js'></script>
     <script src='js/leaflet.markercluster.js'></script>
+    <script src='js/leaflet.draw.js'></script>
+
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <link rel="stylesheet" href="css/stylesheet.css" />
     <link rel="stylesheet" href="css/easy-button.css" />
     <link rel="stylesheet" href="css/leaflet-search.css" />
     <link rel="stylesheet" href="css/markercluster.css" />
+    <link rel="stylesheet" href="css/leaflet.draw.css" />
+
     
 
 </head>
 <body>
 
 <div id="map"></div>
-<div id="logo"><img src="H2OpenMap_icon_2.png" style="width:100px;height:100px;" /></div>
+<div id="logo"><img src="H2OpenMap_logo.png" style="width:100px;height:100px;" /></div>
 <div id="legend">
     
-    <span style="float:right"><a href="#" onclick="$('#legend').css('display','none');">&timesb;</a></span>
+    <a class="legend_close_button" href="#" onclick="$('#legend').css('display','none');">×</a>
 
     <img src="icons/flywheel_yes_no.png" style="display:inline-block"/> flyweel - drinking water yes<br/>
-    <img src="icons/flywheel_no_no.png" style="display:inline-block"/> flyweel drinking - water no<br/>
+    <img src="icons/flywheel_no_no.png" style="display:inline-block"/> flyweel drinking water no<br/>
     <img src="icons/flywheel_no_yes.png" style="display:inline-block"/> flyweel - no water<br/>
     <img src="icons/flywheel_unknown.png" style="display:inline-block"/> flyweel - unknow status<br/>
     <br/>
@@ -54,7 +58,9 @@
     <img src="icons/tap_no_yes.png" style="display:inline-block"/> water tap - no water<br/>
     <img src="icons/tap_unknown.png" style="display:inline-block"/> water tap - unknow status<br/>
     <br/>
-    <img src="icons/water_well_unknown.png" style="display:inline-block"/> unknown water well<br/>
+    <img src="icons/water_well_yes_no.png" style="display:inline-block"/> unknown water well - drinking water yes<br/>
+    <img src="icons/water_well_no_no.png" style="display:inline-block"/> unknown water well - drinking water no<br/>
+    <img src="icons/water_well_unknown.png" style="display:inline-block"/> unknown water well - unknow status<br/>
     <br/>
     <img src="icons/well_yes_no.png" style="display:inline-block"/> water well - drinking water yes<br/>
     <img src="icons/well_no_no.png" style="display:inline-block"/> water well - drinking water no<br/>
@@ -62,8 +68,7 @@
     <img src="icons/well_unknown.png" style="display:inline-block"/> water well - unknow status<br/>
 
     <div class="note">this map is a beta version, some issue still need work. <br/>
-    please refer to <a href="https://github.com/H2OpenMap" target="blank">github H2OpenMap repository </a> to join us.<br/>
-    map made with the Stefano Sabatini great help! </div>
+    please refer to <a href="https://github.com/H2OpenMap" target="blank">github H2OpenMap repository </a></div>
 </div>
 
 <script>
@@ -92,7 +97,11 @@ function chooseIcon(feature) {
     }
     var featureType = 'water_well';
 
-    if(feature['pump'] == 'manual') {
+    if(feature['pump'] != 'manual' || feature['pump'] != 'yes') {
+        featureType = 'water_well';
+    }
+
+    if(feature['pump'] == 'manual' || feature['pump'] == 'yes') {
         featureType = 'pump';
     }
 
@@ -108,7 +117,7 @@ function chooseIcon(feature) {
         featureType = 'lever';
     }
 
-    if (feature['water_well:size'] == 'large'){ //large
+    if (feature['water_well:size'] == 'large' || feature['water_point_type'] == 'open_well'){ //large
         featureType = 'well'
     }
 
@@ -127,11 +136,9 @@ function chooseIcon(feature) {
 function buildPopup(feature, hasImage) {
         var markerText = '';
 
-        markerText+='<a href="#" class=""><img src="H2OpenMap_icon_2.png" style="width:50px;height:50px;" /></a><br/>';
-
         var image = feature['img'];
         if (image === null || image == '' || hasImage == false) image = 'default.png';
-        markerText+='<a href="img/'+image+'.jpg" class="lightbox"><img src="img/'+image+'" style="width:200px;height:200px;" /></a>';
+        markerText+='<a href="img/'+image+'.jpg" class="lightbox"><img src="img/'+image+'" /></a>';
         
         if(feature ['survey:date']!='')
             markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
@@ -183,6 +190,9 @@ function buildPopup(feature, hasImage) {
 
         if(feature ['operator:type']!='')
             markerText+='<b>operator type =</b> '+feature['operator:type']+'<br/>';
+
+        if(feature ['source']!='')
+            markerText+='<b>source:</b> '+feature['source']+'<br/>';
 
         if(feature ['fixme']!='')
             markerText+='<b>fixme:</b> '+feature['fixme']+'<br/>';
@@ -293,6 +303,55 @@ map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
             minLength: 2,
             zoom:13
         }) );
+
+    var drawnItems = new L.FeatureGroup();
+		map.addLayer(drawnItems);
+
+		var drawControl = new L.Control.Draw({
+			draw: {
+				position: 'topleft',
+				polygon: false,
+				rectangle: false,
+				marker:false,
+				polyline: {
+					shapeOptions: {
+                		color: '#0078A8',
+                		weight: 5
+            			},
+					metric: true,
+					guidelineDistance:20,
+				},
+				circle: {
+					shapeOptions: {
+						stroke: true,
+						color: '#0078A8',
+						weight: 1,
+						opacity: 0.5,
+						fill: true,
+						fillColor: null, //same as color by default
+						fillOpacity: 0.2,
+						clickable: true
+					},
+					showRadius: true,
+					metric: true // Whether to use the metric meaurement system or imperial
+				},
+			},
+			edit: {
+				featureGroup: drawnItems
+			}
+		});
+		map.addControl(drawControl);
+
+		map.on('draw:created', function (e) {
+			var type = e.layerType,
+				layer = e.layer;
+
+			if (type === 'marker') {
+				layer.bindPopup('A popup!');
+			}
+
+			drawnItems.addLayer(layer);
+		});
 </script>
 </body>
 </html>
