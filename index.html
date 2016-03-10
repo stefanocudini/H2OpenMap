@@ -13,6 +13,8 @@
     <script src='js/easy-button.js'></script>
     <script src='js/leaflet.markercluster.js'></script>
     <script src='js/leaflet.draw.js'></script>
+    <script src='js/pdfmake.min.js'></script>
+ 	<script src='js/vfs_fonts.js'></script>
 
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -133,7 +135,10 @@ function chooseIcon(feature) {
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
+var dd = '';
+
 function buildPopup(feature, hasImage) {
+
         var markerText = '';
 
         var image = feature['img'];
@@ -192,20 +197,32 @@ function buildPopup(feature, hasImage) {
             markerText+='<b>operator type =</b> '+feature['operator:type']+'<br/>';
 
         if(feature ['source']!='')
-            markerText+='<b>source:</b> '+feature['source']+'<br/>';
+            markerText+='<b>source=</b> '+feature['source']+'<br/>';
 
         if(feature ['fixme']!='')
-            markerText+='<b>fixme:</b> '+feature['fixme']+'<br/>';
+            markerText+='<b>fixme=</b> '+feature['fixme']+'<br/>';
 
         markerText+='</p>';
 
         if (feature ['description']!='')
         markerText+='<p><b>note = </b>'+feature ['description']+'</p>'; //campo note
 
-        markerText+='<p><a href="#" class="">download PDF</a></p>'; //da fare
+        //dd = markerText.replace(/(<([^>]+)>)/ig, " ");
+        dd = markerText;
+
+        //markerText+='<p><a href="#" onclick="pdfMake.createPdf(docDefinition).download();" class="">download PDF</a></p>'; //da fare
+        markerText+='<p><a href="#" onclick="buildPdf()" class="">download PDF</a></p>';
 
         return markerText;
-        
+
+}
+
+var docDefinition = { content: [] };
+
+function buildPdf () {
+    docDefinition = { content: [ { text: dd }, ] };
+    //console.log(docDefinition);
+    pdfMake.createPdf(docDefinition).open();
 }
 
 var map = L.map('map');
