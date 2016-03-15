@@ -14,7 +14,9 @@
     <script src='js/leaflet.markercluster.js'></script>
     <script src='js/leaflet.draw.js'></script>
     <script src='js/pdfmake.min.js'></script>
- 	<script src='js/vfs_fonts.js'></script>
+    <script src='js/vfs_fonts.js'></script>
+    <script src='js/jquery.js'></script>
+    <script src='js/html2pdfmake.js'></script>
 
 
     <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
@@ -28,6 +30,7 @@
 
 </head>
 <body>
+<div class=help>help</div>
 
 <div id="map"></div>
 <div id="logo"><img src="H2OpenMap_logo.png" style="width:100px;height:100px;" /></div>
@@ -135,7 +138,7 @@ function chooseIcon(feature) {
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
-var dd = '';
+//var simpleHtm = '';
 
 function buildPopup(feature, hasImage) {
 
@@ -207,23 +210,21 @@ function buildPopup(feature, hasImage) {
         if (feature ['description']!='')
         markerText+='<p><b>note = </b>'+feature ['description']+'</p>'; //campo note
 
-        //dd = markerText.replace(/(<([^>]+)>)/ig, " ");
-        dd = markerText;
+        simpleHtm = markerText;
 
         //markerText+='<p><a href="#" onclick="pdfMake.createPdf(docDefinition).download();" class="">download PDF</a></p>'; //da fare
-        markerText+='<p><a href="#" onclick="buildPdf()" class="">download PDF</a></p>';
+        markerText+='<p><a href="#" onclick="buildPdf(simpleHtm)" class="">download PDF</a></p>';
 
         return markerText;
 
+
+}
+function buildPdf () {    
+    content = [];
+    ParseHtml(content, simpleHtm);
+    pdfMake.createPdf({content: content}).open();
 }
 
-var docDefinition = { content: [] };
-
-function buildPdf () {
-    docDefinition = { content: [ { text: dd }, ] };
-    //console.log(docDefinition);
-    pdfMake.createPdf(docDefinition).open();
-}
 
 var map = L.map('map');
 
@@ -279,6 +280,7 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
   }).addTo(map);
 
 layerControl.addOverlay(geojson, "H2OpenMap");
+
 map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
 });
 
@@ -298,7 +300,6 @@ map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
                 +'<b>Lat=</b>' + data.lat + '<br/>'
                 +'<b>Lon=</b>' + data.lon + '<br/>'
                 );
-            //return (JSON.stringify(data, null, 4));
         },
         buildIcon: function(data, title) {
            var icon = chooseIcon(data.tags);
@@ -322,53 +323,53 @@ map.fitBounds(geojson.getBounds(), {'padding': [10,10]});
         }) );
 
     var drawnItems = new L.FeatureGroup();
-		map.addLayer(drawnItems);
+        map.addLayer(drawnItems);
 
-		var drawControl = new L.Control.Draw({
-			draw: {
-				position: 'topleft',
-				polygon: false,
-				rectangle: false,
-				marker:false,
-				polyline: {
-					shapeOptions: {
-                		color: '#0078A8',
-                		weight: 5
-            			},
-					metric: true,
-					guidelineDistance:20,
-				},
-				circle: {
-					shapeOptions: {
-						stroke: true,
-						color: '#0078A8',
-						weight: 1,
-						opacity: 0.5,
-						fill: true,
-						fillColor: null, //same as color by default
-						fillOpacity: 0.2,
-						clickable: true
-					},
-					showRadius: true,
-					metric: true // Whether to use the metric meaurement system or imperial
-				},
-			},
-			edit: {
-				featureGroup: drawnItems
-			}
-		});
-		map.addControl(drawControl);
+        var drawControl = new L.Control.Draw({
+            draw: {
+                position: 'topleft',
+                polygon: false,
+                rectangle: false,
+                marker:false,
+                polyline: {
+                    shapeOptions: {
+                        color: '#0078A8',
+                        weight: 5
+                        },
+                    metric: true,
+                    guidelineDistance:20,
+                },
+                circle: {
+                    shapeOptions: {
+                        stroke: true,
+                        color: '#0078A8',
+                        weight: 1,
+                        opacity: 0.5,
+                        fill: true,
+                        fillColor: null, //same as color by default
+                        fillOpacity: 0.2,
+                        clickable: true
+                    },
+                    showRadius: true,
+                    metric: true // Whether to use the metric meaurement system or imperial
+                },
+            },
+            edit: {
+                featureGroup: drawnItems
+            }
+        });
+        map.addControl(drawControl);
 
-		map.on('draw:created', function (e) {
-			var type = e.layerType,
-				layer = e.layer;
+        map.on('draw:created', function (e) {
+            var type = e.layerType,
+                layer = e.layer;
 
-			if (type === 'marker') {
-				layer.bindPopup('A popup!');
-			}
+            if (type === 'marker') {
+                layer.bindPopup('A popup!');
+            }
 
-			drawnItems.addLayer(layer);
-		});
+            drawnItems.addLayer(layer);
+        });
 </script>
 </body>
 </html>
