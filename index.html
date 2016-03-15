@@ -30,7 +30,7 @@
 
 </head>
 <body>
-<div class=help>help</div>
+<div class="help">help</div>
 
 <div id="map"></div>
 <div id="logo"><img src="H2OpenMap_logo.png" style="width:100px;height:100px;" /></div>
@@ -138,11 +138,13 @@ function chooseIcon(feature) {
         return 'icons/'+featureType+'_'+drinkable+'_'+dry+'.png';
 }
 
-//var simpleHtm = '';
+var pdfTexts = [];
+var pdfCounter = -1;
 
-function buildPopup(feature, hasImage) {
+function buildPopup(marker, hasImage, ll) {
 
         var markerText = '';
+        var feature = marker['properties'];
 
         var image = feature['img'];
         if (image === null || image == '' || hasImage == false) image = 'default.png';
@@ -151,8 +153,7 @@ function buildPopup(feature, hasImage) {
         if(feature ['survey:date']!='')
             markerText+='<p><b>survey date =</b> '+feature['survey:date']+'<br/>';
 
-        //if(??? []!='')
-            //markerText+='<b>position =</b> '+JSON.stringify(???, null, 4);+'<br/>'; //how to show Lat Lon in this place?
+        markerText+='<b>position =</b> '+ll.lat+','+ll.lng+'<br/>'; //how to show Lat Lon in this place?
 
         if(feature ['ref:h2openmap']!='')
             markerText+='<b>ref h2openmap =</b> '+feature['ref:h2openmap']+'<br/>';
@@ -210,18 +211,17 @@ function buildPopup(feature, hasImage) {
         if (feature ['description']!='')
         markerText+='<p><b>note = </b>'+feature ['description']+'</p>'; //campo note
 
-        simpleHtm = markerText;
+        pdfCounter++;
+        pdfTexts[pdfCounter]=markerText;
 
-        //markerText+='<p><a href="#" onclick="pdfMake.createPdf(docDefinition).download();" class="">download PDF</a></p>'; //da fare
-        markerText+='<p><a href="#" onclick="buildPdf(simpleHtm)" class="">download PDF</a></p>';
+        markerText+='<p><a href="#" onclick="buildPdf(pdfTexts['+pdfCounter+'])" class="">download PDF</a></p>';
 
         return markerText;
-
-
 }
-function buildPdf () {    
+
+function buildPdf (text) {    
     content = [];
-    ParseHtml(content, simpleHtm);
+    ParseHtml(content, text);
     pdfMake.createPdf({content: content}).open();
 }
 
@@ -243,8 +243,6 @@ var OpenStreetMap_HOT = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x
     maxZoom: 18,
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, Tiles courtesy of <a href="http://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>'
 });
-
-
 
 var googleSat = L.tileLayer('https://mts{s}.google.com/vt/lyrs=s@186112443&hl=x-local&src=app&x={x}&y={y}&z={z}&s=Galile', {
                     subdomains: '0123',
@@ -273,7 +271,7 @@ $.getJSON('api.php', {'wells': '1'}, function(remoteData){
       pointToLayer: function (feature, latlng) {
         var icon = chooseIcon(feature['properties']);
         var marker = L.marker(latlng, {icon: new h2icon( {iconUrl: icon} )} );
-        var markerText = buildPopup(feature['properties'], true);
+        var markerText = buildPopup(feature, true, latlng);
         marker.bindPopup(markerText);
         return marker;
     }
