@@ -6,7 +6,7 @@ Is a leaflet map of water wells surved in 1st rasmata onlus - H2OpenMap mapping 
 - custom icons
 - data and photos in pop up
 
-See how it work on www.h2openmap.org/map
+See how it work on www.h2openmap.org
 
 ###done stuff:
 
